@@ -17,16 +17,30 @@ services:
       start_period: 10s
     container_name: graphql-federation_db
 
+  gateway:
+    build: ./gateway/.
+    command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails db:create && rails db:migrate && rails db:seed:replant && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./gateway:/myapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: development 
+    container_name: graphql-federation_gateway
+
   app1:
     build: ./service_1/.
     command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails db:create && rails db:migrate && rails db:seed:replant && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
       - ./service_1:/myapp
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
-      db:
-        condition: service_healthy
+      gateway:
+        condition: service_started
     environment:
       RAILS_ENV: development 
     container_name: graphql-federation_app1
@@ -37,10 +51,10 @@ services:
     volumes:
       - ./service_2:/myapp
     ports:
-      - "3001:3000"
+      - "3002:3000"
     depends_on:
-      db:
-        condition: service_healthy
+      gateway:
+        condition: service_started
     environment:
       RAILS_ENV: development 
     container_name: graphql-federation_app2
