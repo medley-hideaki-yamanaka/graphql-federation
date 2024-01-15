@@ -1,0 +1,49 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: graphql
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-store:/var/lib/mysql
+    healthcheck:
+      test: "mysqladmin ping -h 127.0.0.1 -u root -ppassword"
+      interval: 5s
+      timeout: 1s
+      retries: 5
+      start_period: 10s
+    container_name: graphql-federation_db
+
+  app1:
+    build: ./service_1/.
+    command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails db:create && rails db:migrate && rails db:seed:replant && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./service_1:/myapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: development 
+    container_name: graphql-federation_app1
+
+  app2:
+    build: ./service_2/.
+    command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails db:create && rails db:migrate && rails db:seed:replant && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./service_2:/myapp
+    ports:
+      - "3001:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: development 
+    container_name: graphql-federation_app2
+
+volumes:
+  db-store:
