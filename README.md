@@ -1,6 +1,10 @@
 # graphql-federation
 
 ## version
+### Apollo Gateway
+- node.js: 16.20.0
+
+### Apollo Server
 - ruby: 3.1
 - rails: 6.1
 
@@ -14,6 +18,10 @@ docker-compose up -d
 docker-compose down
 ```
 
-## GraphQL IDE
+## GraphQL Sandbox
 
-http://localhost:3000/grahpiql
+https://studio.apollographql.com/sandbox/explorer
+
+
+## 構成
+![image](assets/graphql-federation.drawio.png)
