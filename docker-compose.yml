@@ -13,48 +13,60 @@ services:
       test: "mysqladmin ping -h 127.0.0.1 -u root -ppassword"
       interval: 5s
       timeout: 1s
-      retries: 5
-      start_period: 10s
+      retries: 3
+      start_period: 15s
     container_name: graphql-federation_db
 
   gateway:
     build: ./gateway/.
-    command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails db:create && rails db:migrate && rails db:seed:replant && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - ./gateway:/myapp
+      - ./gateway:/app
+      - /app/node_modules
     ports:
-      - "3000:3000"
+      - "4000:4000"
     depends_on:
-      db:
+      app2:
         condition: service_healthy
     environment:
-      RAILS_ENV: development 
+      NODE_ENV: production 
     container_name: graphql-federation_gateway
 
   app1:
-    build: ./service_1/.
+    build: ./service_author/.
     command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails db:create && rails db:migrate && rails db:seed:replant && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - ./service_1:/myapp
+      - ./service_author:/myapp
     ports:
       - "3001:3000"
     depends_on:
-      gateway:
-        condition: service_started
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: "curl localhost:3000"
+      interval: 5s
+      timeout: 1s
+      retries: 3
+      start_period: 15s
     environment:
       RAILS_ENV: development 
     container_name: graphql-federation_app1
 
   app2:
-    build: ./service_2/.
+    build: ./service_book/.
     command: bash -c "rm -f tmp/pids/server.pid && bundle install && rails db:create && rails db:migrate && rails db:seed:replant && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - ./service_2:/myapp
+      - ./service_book:/myapp
     ports:
       - "3002:3000"
     depends_on:
-      gateway:
-        condition: service_started
+      app1:
+        condition: service_healthy
+    healthcheck:
+      test: "curl localhost:3000"
+      interval: 5s
+      timeout: 1s
+      retries: 3
+      start_period: 15s
     environment:
       RAILS_ENV: development 
     container_name: graphql-federation_app2

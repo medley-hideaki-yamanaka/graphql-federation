@@ -1,20 +1,12 @@
-FROM ruby:3.1
+FROM node:16.20
 
-RUN mkdir /myapp
-WORKDIR /myapp
-COPY Gemfile /myapp/Gemfile
-COPY Gemfile.lock /myapp/Gemfile.lock
+ENV NODE_ENV production
 
-RUN gem update --system
-RUN bundle update --bundler
+WORKDIR /app
 
-RUN bundle install
-COPY . /myapp
+COPY ./package.json yarn.lock ./
+RUN yarn install --prod
+RUN chown -R node:node .
 
-COPY entrypoint.sh /usr/bin/
-RUN chmod +x /usr/bin/entrypoint.sh
-ENTRYPOINT ["entrypoint.sh"]
-EXPOSE 3000
-
-CMD ["rails", "server", "-b", "0.0.0.0"]
-
+USER node
+CMD ["yarn", "start"]
