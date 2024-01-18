@@ -1,0 +1,21 @@
+type Author @key(fields: "id", resolvable: false) @extends {
+  id: ID! @external
+}
+
+type Book @key(fields: "id") {
+  author: Author!
+  authorId: Int
+  createdAt: ISO8601DateTime!
+  id: ID!
+  title: String
+  updatedAt: ISO8601DateTime!
+}
+
+"""
+An ISO 8601-encoded datetime
+"""
+scalar ISO8601DateTime @specifiedBy(url: "https://tools.ietf.org/html/rfc3339")
+
+type Query {
+  books: [Book!]!
+}

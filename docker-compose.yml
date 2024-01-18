@@ -23,13 +23,24 @@ services:
       - ./gateway:/app
       - /app/node_modules
     ports:
-      - "4000:4000"
+      - "4001:4000"
     depends_on:
       app2:
         condition: service_healthy
     environment:
       NODE_ENV: production 
     container_name: graphql-federation_gateway
+
+  router:
+    build: ./router/.
+    volumes:
+      - ./router:/router
+    ports:
+      - "4000:4000"
+    depends_on:
+      - gateway
+    container_name: graphql-federation_router
+    command: bash -c "router --config /router/router.yml --supergraph /router/supergraph.graphql"
 
   app1:
     build: ./service_author/.

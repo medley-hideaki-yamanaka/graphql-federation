@@ -1,0 +1,10 @@
+federation_version: =2.6.2
+subgraphs:
+  authors:
+    routing_url: http://app1:3000/graphql
+    schema:
+      file: ./author-schema.graphql
+  books:
+    routing_url: http://app2:3000/graphql
+    schema:
+      file: ./book-schema.graphql
