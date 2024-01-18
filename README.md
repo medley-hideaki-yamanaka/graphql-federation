@@ -1,5 +1,7 @@
 # graphql-federation
 
+GraphQL Federationのサンプルアプリ
+
 ## version
 ### Apollo Gateway
 - node.js: 16.20.0
