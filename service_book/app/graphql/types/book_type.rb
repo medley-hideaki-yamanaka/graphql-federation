@@ -12,7 +12,8 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     def self.resolve_reference(reference, _context)
-      ::Book.find(reference[:id])
+      # ::Book.find(reference[:id])
+      _context.dataloader.with(::Sources::BookById).load(reference[:id])
     end
 
     def author

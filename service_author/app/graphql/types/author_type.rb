@@ -7,7 +7,8 @@ module Types
     field :name, String, null: false
 
     def self.resolve_reference(reference, _context)
-      ::Author.find(reference[:id])
+      # ::Author.find(reference[:id])
+      _context.dataloader.with(::Sources::AuthorById).load(reference[:id])
     end
   end
 end
