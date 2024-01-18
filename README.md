@@ -22,6 +22,21 @@ docker-compose down
 
 https://studio.apollographql.com/sandbox/explorer
 
+### query
+
+```
+query {
+  books {
+    id
+    title
+    author {
+      id
+      name
+    }
+  }
+}
+```
+
 
 ## 構成
 ![image](assets/graphql-federation.drawio.png)
